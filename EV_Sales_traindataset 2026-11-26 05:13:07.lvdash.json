@@ -1,0 +1,875 @@
+{
+  "datasets": [
+    {
+      "name": "dataset1",
+      "displayName": "EV_Sales_traindataset",
+      "config": {
+        "version": "1.1",
+        "source": "electric_vehicle.ev_sales.EV_Sales_traindataset",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "displayName": "Count",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all"
+          },
+          {
+            "name": "yes_count",
+            "expr": "SUM(CASE WHEN Will_Buy_EV = 'Yes' THEN 1 ELSE 0 END)",
+            "displayName": "Will Buy EV (Yes)",
+            "comment": "Number of respondents who answered Yes to buying an EV"
+          },
+          {
+            "name": "ev_purchase_rate",
+            "expr": "100.0 * MEASURE(`yes_count`) / MEASURE(`count`)",
+            "displayName": "EV Purchase Rate (%)",
+            "comment": "Percentage of respondents willing to buy an EV"
+          },
+          {
+            "name": "avg_income",
+            "expr": "AVG(Annual_Income_USD)",
+            "displayName": "Avg Annual Income (USD)",
+            "comment": "Average annual income of respondents in USD"
+          },
+          {
+            "name": "avg_commute",
+            "expr": "AVG(Daily_Commute_km)",
+            "displayName": "Avg Daily Commute (km)",
+            "comment": "Average daily commute distance in kilometers"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "page1",
+      "displayName": "EV_Sales Dashboard",
+      "layout": [
+        {
+          "widget": {
+            "name": "bar_chart1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Will_Buy_EV",
+                      "expression": "`Will_Buy_EV`"
+                    },
+                    {
+                      "name": "City_Type",
+                      "expression": "`City_Type`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Will Buy EV by City Type"
+              },
+              "version": 3,
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "City_Type",
+                  "displayName": "City Type",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(count)",
+                  "displayName": "Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Will_Buy_EV",
+                  "displayName": "Will Buy EV",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 7,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "text_box1",
+            "spec": {
+              "widgetType": "text",
+              "version": 1,
+              "encodings": {
+                "text": {
+                  "lines": [
+                    "# Dashboard for EV Sales at Charging Ahead Motors\n",
+                    "\n",
+                    "The dashboards provides a visual analysis of the sales of Electric Vehicles for business decision to be made."
+                  ],
+                  "fields": []
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "table1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "id",
+                      "expression": "`id`"
+                    },
+                    {
+                      "name": "Age",
+                      "expression": "`Age`"
+                    },
+                    {
+                      "name": "Annual_Income_USD",
+                      "expression": "`Annual_Income_USD`"
+                    },
+                    {
+                      "name": "Daily_Commute_km",
+                      "expression": "`Daily_Commute_km`"
+                    },
+                    {
+                      "name": "Number_of_Cars_Owned",
+                      "expression": "`Number_of_Cars_Owned`"
+                    },
+                    {
+                      "name": "Charging_Stations_Near_Home",
+                      "expression": "`Charging_Stations_Near_Home`"
+                    },
+                    {
+                      "name": "Charging_Stations_Near_Work",
+                      "expression": "`Charging_Stations_Near_Work`"
+                    },
+                    {
+                      "name": "Environmental_Concern_Level",
+                      "expression": "`Environmental_Concern_Level`"
+                    },
+                    {
+                      "name": "Gender",
+                      "expression": "`Gender`"
+                    },
+                    {
+                      "name": "City_Type",
+                      "expression": "`City_Type`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "EV Sales Survey Responses"
+              },
+              "version": 2,
+              "rowsPerPage": 25,
+              "displayRowNumbers": false,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "id",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Age",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Annual_Income_USD",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Daily_Commute_km",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Number_of_Cars_Owned",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Charging_Stations_Near_Home",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Charging_Stations_Near_Work",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Environmental_Concern_Level",
+                    "useForSearch": false,
+                    "format": {
+                      "type": "numeral.js",
+                      "format": "0.00"
+                    },
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Gender",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "City_Type",
+                    "useForSearch": false,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_total_responses",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Responses"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(count)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_purchase_rate",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "measure(ev_purchase_rate)",
+                      "expression": "MEASURE(`ev_purchase_rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "EV Purchase Rate (%)"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(ev_purchase_rate)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_income",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "measure(avg_income)",
+                      "expression": "MEASURE(`avg_income`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Annual Income (USD)"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(avg_income)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_commute",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "measure(avg_commute)",
+                      "expression": "MEASURE(`avg_commute`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Daily Commute (km)"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(avg_commute)",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_range_anxiety",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Will_Buy_EV",
+                      "expression": "`Will_Buy_EV`"
+                    },
+                    {
+                      "name": "Range_Anxiety_Level",
+                      "expression": "`Range_Anxiety_Level`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Will Buy EV by Range Anxiety Level",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Range_Anxiety_Level",
+                  "displayName": "Range_Anxiety_Level",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(count)",
+                  "displayName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Will_Buy_EV",
+                  "displayName": "Will_Buy_EV",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 5,
+            "width": 5,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_subsidy",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Will_Buy_EV",
+                      "expression": "`Will_Buy_EV`"
+                    },
+                    {
+                      "name": "Subsidy_Available",
+                      "expression": "`Subsidy_Available`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Will Buy EV by Subsidy Availability"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Subsidy_Available",
+                  "displayName": "Subsidy_Available",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(count)",
+                  "displayName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Will_Buy_EV",
+                  "displayName": "Will_Buy_EV",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_current_car",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Will_Buy_EV",
+                      "expression": "`Will_Buy_EV`"
+                    },
+                    {
+                      "name": "Current_Car_Type",
+                      "expression": "`Current_Car_Type`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Will Buy EV by Current Car Type"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Current_Car_Type",
+                  "displayName": "Current_Car_Type",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(count)",
+                  "displayName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Will_Buy_EV",
+                  "displayName": "Will_Buy_EV",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 10,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_gender",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Will_Buy_EV",
+                      "expression": "`Will_Buy_EV`"
+                    },
+                    {
+                      "name": "Gender",
+                      "expression": "`Gender`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Will Buy EV by Gender"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Gender",
+                  "displayName": "Gender",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(count)",
+                  "displayName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Will_Buy_EV",
+                  "displayName": "Will_Buy_EV",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 10,
+            "width": 4,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "8b2d2362",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "6056084f",
+            "queries": [
+              {
+                "name": "dashboards/01f1e929f73f1d1c8f6f1f206c0b3b54/datasets/01f1e929f73f1e578b8d68021eb16439_Environmental_Concern_Level",
+                "query": {
+                  "datasetName": "dataset1",
+                  "fields": [
+                    {
+                      "name": "Environmental_Concern_Level",
+                      "expression": "`Environmental_Concern_Level`"
+                    },
+                    {
+                      "name": "Environmental_Concern_Level_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "Environmental_Concern_Level",
+                    "queryName": "dashboards/01f1e929f73f1d1c8f6f1f206c0b3b54/datasets/01f1e929f73f1e578b8d68021eb16439_Environmental_Concern_Level"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
