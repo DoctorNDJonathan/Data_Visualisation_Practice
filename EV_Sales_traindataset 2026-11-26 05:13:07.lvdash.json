@@ -44,6 +44,32 @@
           }
         ]
       }
+    },
+    {
+      "name": "corr_matrix",
+      "displayName": "EV Encoded Correlation Matrix",
+      "config": {
+        "version": "1.1",
+        "source": "WITH encoded AS (\n  SELECT\n    id,\n    CAST(Age AS DOUBLE) AS Age,\n    CAST(Annual_Income_USD AS DOUBLE) AS Annual_Income_USD,\n    CAST(Daily_Commute_km AS DOUBLE) AS Daily_Commute_km,\n    CAST(Number_of_Cars_Owned AS DOUBLE) AS Number_of_Cars_Owned,\n    CAST(Charging_Stations_Near_Home AS DOUBLE) AS Charging_Stations_Near_Home,\n    CAST(Charging_Stations_Near_Work AS DOUBLE) AS Charging_Stations_Near_Work,\n    CAST(Environmental_Concern_Level AS DOUBLE) AS Environmental_Concern_Level,\n    CASE WHEN Gender = 'Male' THEN 1.0 ELSE 0.0 END AS Gender_Male,\n    CASE WHEN Gender = 'Female' THEN 1.0 ELSE 0.0 END AS Gender_Female,\n    CASE WHEN Gender = 'Other' THEN 1.0 ELSE 0.0 END AS Gender_Other,\n    CASE WHEN City_Type = 'Urban' THEN 1.0 ELSE 0.0 END AS City_Type_Urban,\n    CASE WHEN City_Type = 'Suburban' THEN 1.0 ELSE 0.0 END AS City_Type_Suburban,\n    CASE WHEN City_Type = 'Rural' THEN 1.0 ELSE 0.0 END AS City_Type_Rural,\n    CASE WHEN Current_Car_Type = 'Sedan' THEN 1.0 ELSE 0.0 END AS Car_Type_Sedan,\n    CASE WHEN Current_Car_Type = 'SUV' THEN 1.0 ELSE 0.0 END AS Car_Type_SUV,\n    CASE WHEN Current_Car_Type = 'Hatchback' THEN 1.0 ELSE 0.0 END AS Car_Type_Hatchback,\n    CASE WHEN Current_Car_Type = 'Truck' THEN 1.0 ELSE 0.0 END AS Car_Type_Truck,\n    CASE WHEN Home_Charging_Possible = 'Yes' THEN 1.0 ELSE 0.0 END AS Home_Charging_Possible,\n    CASE WHEN Subsidy_Available = 'Yes' THEN 1.0 ELSE 0.0 END AS Subsidy_Available,\n    CASE WHEN Range_Anxiety_Level = 'Low' THEN 1.0 WHEN Range_Anxiety_Level = 'Medium' THEN 2.0 WHEN Range_Anxiety_Level = 'High' THEN 3.0 ELSE 0.0 END AS Range_Anxiety_Rank,\n    CASE WHEN Will_Buy_EV = 'Yes' THEN 1.0 ELSE 0.0 END AS Will_Buy_EV_Flag\n  FROM electric_vehicle.ev_sales.EV_Sales_traindataset\n),\nlong_form AS (\n  SELECT id, variable, value\n  FROM encoded\n  UNPIVOT (value FOR variable IN (\n    Age, Annual_Income_USD, Daily_Commute_km, Number_of_Cars_Owned,\n    Charging_Stations_Near_Home, Charging_Stations_Near_Work, Environmental_Concern_Level,\n    Gender_Male, Gender_Female, Gender_Other,\n    City_Type_Urban, City_Type_Suburban, City_Type_Rural,\n    Car_Type_Sedan, Car_Type_SUV, Car_Type_Hatchback, Car_Type_Truck,\n    Home_Charging_Possible, Subsidy_Available, Range_Anxiety_Rank, Will_Buy_EV_Flag\n  ))\n)\nSELECT\n  a.variable AS variable_x,\n  b.variable AS variable_y,\n  CORR(a.value, b.value) AS correlation\nFROM long_form a\nJOIN long_form b ON a.id = b.id\nGROUP BY a.variable, b.variable\n",
+        "dimensions": [
+          {
+            "name": "variable_x",
+            "expr": "variable_x"
+          },
+          {
+            "name": "variable_y",
+            "expr": "variable_y"
+          }
+        ],
+        "measures": [
+          {
+            "name": "correlation",
+            "expr": "ANY_VALUE(correlation)",
+            "displayName": "Correlation",
+            "comment": "Pearson correlation between the two encoded variables"
+          }
+        ]
+      }
     }
   ],
   "pages": [
@@ -207,7 +233,10 @@
             "spec": {
               "frame": {
                 "showTitle": true,
-                "title": "EV Sales Survey Responses"
+                "title": {
+                  "value": "EV Sales Survey Responses",
+                  "fields": []
+                }
               },
               "version": 2,
               "rowsPerPage": 25,
@@ -356,7 +385,7 @@
           },
           "position": {
             "x": 0,
-            "y": 18,
+            "y": 25,
             "width": 12,
             "height": 6
           }
@@ -807,6 +836,84 @@
             "width": 4,
             "height": 5
           }
+        },
+        {
+          "widget": {
+            "name": "heatmap_correlation",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "corr_matrix",
+                  "fields": [
+                    {
+                      "name": "measure(correlation)",
+                      "expression": "MEASURE(`correlation`)"
+                    },
+                    {
+                      "name": "variable_x",
+                      "expression": "`variable_x`"
+                    },
+                    {
+                      "name": "variable_y",
+                      "expression": "`variable_y`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Correlation Heatmap of Encoded Variables"
+              },
+              "version": 3,
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "variable_x",
+                  "displayName": "Variable",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "variable_y",
+                  "displayName": "Variable",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "measure(correlation)",
+                  "displayName": "Correlation",
+                  "scale": {
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "redblue"
+                    },
+                    "domain": {
+                      "max": 1,
+                      "mid": 0,
+                      "min": -1,
+                      "type": "custom"
+                    },
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 12,
+            "height": 10
+          }
         }
       ],
       "pageType": "PAGE_TYPE_CANVAS",
@@ -871,5 +978,18 @@
       "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
     },
     "applyModeEnabled": false
-  }
+  },
+  "bookmarks": [
+    {
+      "name": "42de8a2d",
+      "displayName": "Data_Viz",
+      "widgetSelections": [
+        {
+          "pageName": "8b2d2362",
+          "widgetName": "6056084f",
+          "selectionJson": "{\"kind\":\"operator\",\"operator\":\"and\",\"args\":[]}"
+        }
+      ]
+    }
+  ]
 }
